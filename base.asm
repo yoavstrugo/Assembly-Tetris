@@ -127,8 +127,8 @@ cursorBlinkSpeed db 9
 
 
 ;======= Files =======
-	paletteImg db 'palette1.bmp', 0
-	bgImg db 't1.bmp',0
+	paletteImg db 'palette.bmp', 0
+	bgImg db 'gameBG.bmp',0
 	filehandle dw ?;
 	Header db 54 dup (0)
 	Palette db 256*4 dup (0)

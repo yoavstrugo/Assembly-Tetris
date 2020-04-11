@@ -3,6 +3,6 @@
 
 # But the project files
 !base.asm
-!palette1.bmp
-!t1.bmp
+!palette.bmp
+!gameBG.bmp
 !README.md
