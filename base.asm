@@ -156,19 +156,8 @@ cursorBlinkSpeed db 9
 	ten db 10
 
 CODESEG
-
-;	╔═══════════════════════════╗
-;	║			   Error				║
-;	╠═══════════════════════════╣				
-;	║ Description:						║
-;	║	Prints the error. (INT 21)		║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	ax (error code)					║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Prints the error. (INT 21) 
+; @param errorCode The error code you want to print
 proc Error
 	; Save BP
 	push bp
@@ -235,20 +224,9 @@ proc Error
 	ret 2
 endp Error
 
-;	╔═══════════════════════════╗
-;	║			  Open File				║
-;	╠═══════════════════════════╣				
-;	║ Description:						║
-;	║	Open a file and moves it   		║
-;	║	into the file handler.			║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	fileName						║
-;	║	fileHandle						║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Open a file and moves it into the file handle.
+; @param fileName The name od the file
+; @param fileHandle The file handle
 proc OpenFile
 	; Save BP
 	push bp
@@ -287,19 +265,8 @@ proc OpenFile
 		ret 4
 endp OpenFile
 
-;	╔═══════════════════════════╗
-;	║			 Close File				║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Closes the current open			║
-;	║	file.							║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	fileHandle						║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Close the current open file in the file handle
+; @param fileHandle The file handle
 proc CloseFile
 	; Save BP
 	push bp
@@ -318,20 +285,9 @@ proc CloseFile
 	ret 2
 endp CloseFile
 
-;	╔═══════════════════════════╗
-;	║			 Read Header			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Reads the header of a bmp		║
-;	║	file.							║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	fileHandle						║
-;	║	headerOutput					║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Reads the header of a bmp file.	
+; @param fileHandle The file handle
+; @param headerOutput Where to store the header		
 proc ReadHeader
 	; Save BP
 	push bp
@@ -366,20 +322,9 @@ proc ReadHeader
 		ret	4
 endp ReadHeader
 
-;	╔═══════════════════════════╗
-;	║			 Read Palette			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Reads the palette of a bmp		║
-;	║	file.							║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	fileHandle						║
-;	║	paletteOutput					║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Reads the palette of a bmp file.	
+; @param fileHandle The file handle
+; @param paletteOutput Where to store the palette
 proc ReadPalette
 	; Save BP
 	push bp
@@ -415,20 +360,9 @@ proc ReadPalette
 		ret	4
 endp ReadPalette
 
-;	╔═══════════════════════════╗
-;	║			 Copy Palette			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Copies a palette to the 		║
-;	║	video memory.					║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	fileHandle						║
-;	║	palette							║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Copies a palette to the video memory.
+; @param fileHandle The file handle.
+; @param palette The palette.
 proc CopyPal
 	; Save BP
 	push bp
@@ -475,20 +409,9 @@ proc CopyPal
 	ret 4
 endp CopyPal
 
-;	╔═══════════════════════════╗
-;	║			 Copy Bitmap			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Copies a bitmap image to 		║
-;	║	the screen.						║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	fileHandle						║
-;	║	palette							║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Copies a bmp image to the screen.
+; @param fileHandle The file handle.
+; @param palette The palette.
 proc CopyBitmap
 	; Save BP
 	push bp
@@ -551,22 +474,12 @@ proc CopyBitmap
 	ret 4
 endp CopyBitmap
 
-;	╔═══════════════════════════╗
-;	║			    Draw				║
-;	╠═══════════════════════════╣				
-;	║ Description:						║
-;	║	Draw an array.			   		║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	array							║
-;	║	arrayWidth						║
-;	║	arrayHeight						║
-;	║	xPos							║
-;	║	yPos							║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Draw an array.
+; @param array The array you want to draw (matrix).
+; @param arrayWidth The width of the array.
+; @param arrayHeight The height of the array.
+; @param xPos Where to start drawing the array on the X axis.
+; @param yPos Where to start drawing the array on the Y axis.
 proc Draw
 	push bp
 	mov bp, sp
@@ -608,21 +521,11 @@ proc Draw
 	ret 10
 endp Draw
 
-;	╔═══════════════════════════╗
-;	║		   		Rotate				║
-;	╠═══════════════════════════╣				
-;	║ Description:						║
-;	║	Returns the new index of a 		║
-;	║	rotated cell in 4x4 matrix		║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	xPos				 			║
-;	║	yPos							║
-;	║	rotations						║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	ax = new index					║
-;	╚═══════════════════════════╝
+; Returns the new index of a rotated cell in 4x4 matrix.
+; @param xPos The X position of the cell (in relation to the matrix).
+; @param yPos The Y position of the cell (in relation to the matrix).
+; @param rotations How many rotation
+; @ret ax=newIndex
 proc Rotate
 	; Save BP
 	push bp
@@ -698,21 +601,10 @@ proc Rotate
 	ret 6
 endp Rotate
 
-;	╔═══════════════════════════╗
-;	║	  		 Fill Block				║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Fills a blocks array with		║
-;	║	it's colors						║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	hightlightColor		 			║
-;	║	array (N*N)						║
-;	║	size (N)						║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Fills a blocks array with it's colors
+; @param hightlightColor The color of the highlight of the block
+; @param array The array of the block (square)
+; @param size The size of the array (N)
 proc FillBlock
 	; Save BP
 	push bp
@@ -815,19 +707,7 @@ proc FillBlock
 	ret 6
 endp FillBlock
 
-;	╔═══════════════════════════╗
-;	║	Initiallize Background Image	║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Initiallizes the background		║
-;	║	image.							║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Initiallizes the background image. (Static)
 proc InitiallizeBackgroundImage
 	; Load Background
 	push offset bgImg
@@ -851,19 +731,7 @@ proc InitiallizeBackgroundImage
 	ret
 endp InitiallizeBackgroundImage
 
-;	╔═══════════════════════════╗
-;	║	  Initiallize Game Palette		║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Initiallizes the game's			║
-;	║	color palette.					║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Initiallizes the color palette of the game. (Static)
 proc InitiallizeGamePalette
 	; Load the games color palette
 
@@ -888,19 +756,7 @@ proc InitiallizeGamePalette
 	ret
 endp InitiallizeGamePalette
 
-;	╔═══════════════════════════╗
-;	║	  Initiallize Game Field		║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Initiallizes the game field		║
-;	║	array.							║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Initiallizes the game field array. (Static)
 proc InitiallizeGameField
 	pusha
 	
@@ -957,19 +813,7 @@ proc InitiallizeGameField
 	ret
 endp InitiallizeGameField
 
-;	╔═══════════════════════════╗
-;	║	  	  Initiallize Random		║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Initiallizes the PRNG, sets		║
-;	║	x0								║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Initiallizes the PRNG, sets x0 (Static)
 proc InitiallizeRandom
 	pusha 
 
@@ -985,18 +829,7 @@ proc InitiallizeRandom
 	ret
 endp InitiallizeRandom
 
-;	╔═══════════════════════════╗
-;	║	  	  	   Render				║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Renders the screen array		║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Renders the screen array. (Static)
 proc Render
 	pusha
 
@@ -1070,22 +903,12 @@ proc Render
 	ret
 endp Render
 
-;	╔═══════════════════════════╗
-;	║	  	   Does Piece Fit			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Checks if a tetromino fits 		║
-;	║	in a given position.			║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	pieceID				 			║
-;	║	pieceRotation		 			║
-;	║	tetrominoX			 			║
-;	║	tetrominoY			 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	ax = 0 - false, 1 - true		║
-;	╚═══════════════════════════╝
+; Checks if a tetromino fits in a given position.
+; @param pieceID The ID of the piece.
+; @param pieceRotation The rotation of the piece.
+; @param tetrominoX The X position of the piece.
+; @param tetrominoY The Y position of the piece.
+;	@ret ax=0-false,1-true
 proc DoesPieceFit
 	; Save BP
 	push bp
@@ -1195,19 +1018,9 @@ proc DoesPieceFit
 	ret 8
 endp DoesPieceFit
 
-;	╔═══════════════════════════╗
-;	║	  	  Get Piece Color			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Get the color from the piece	║
-;	║	id.								║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	pieceID				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	ax = color						║
-;	╚═══════════════════════════╝
+; Get the color from the piece id.
+; @param pieceID The ID of the piece.
+; @ret ax=color
 proc GetPieceColor
 	; Save BP
 	push bp
@@ -1233,19 +1046,9 @@ proc GetPieceColor
 	ret 2
 endp GetPieceColor
 
-;	╔═══════════════════════════╗
-;	║	  	  Get Piece Offset			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Get the offset (relative to 	║
-;	║	array) of the piece				║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	pieceID				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	bx = offset						║
-;	╚═══════════════════════════╝
+; Get the offset (relative to array) of the piece
+; @param pieceID The ID of the piece.
+; @ret bx=offset
 proc GetPieceOffset
 	; Save BP
 	push bp
@@ -1268,22 +1071,12 @@ proc GetPieceOffset
 	ret 2
 endp GetPieceOffset
 
-;	╔═══════════════════════════╗
-;	║	  	   Get Cell offset			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Get the offset (relative to 	║
-;	║	array) of the cell.  			║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	array				 			║
-;	║	arrayWidth			 			║
-;	║	xPos				 			║
-;	║	yPos				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	bx = index						║
-;	╚═══════════════════════════╝
+; Get the offset (relative to array) of the cell.
+; @param array The array of the cell.
+; @param arrayWidth The width of the array.
+; @param xPos The X position of the cell (relative to the array).
+; @param yPos The Y position of the cell (relative to the array).
+; @ret bx=index
 proc GetCellOffset
 	; Save BP
 	push bp
@@ -1312,19 +1105,7 @@ proc GetCellOffset
 	ret 8
 endp GetCellOffset
 
-;	╔═══════════════════════════╗
-;	║	  	 Draw Current Piece			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Draws the current piece into	║
-;	║	the screen array.				║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Draws the current piece into the screen array. (Static)
 proc DrawCurrentPiece
 	pusha
 
@@ -1377,19 +1158,7 @@ proc DrawCurrentPiece
 	ret
 endp DrawCurrentPiece
 
-;	╔═══════════════════════════╗
-;	║	  	  Draw Game Field			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Draws the game field into		║
-;	║	the screen array.				║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Draws the game field into the screen array.
 proc DrawGameField
 	pusha
 
@@ -1415,19 +1184,7 @@ proc DrawGameField
 	ret
 endp DrawGameField
 
-;	╔═══════════════════════════╗
-;	║	  	Lock Piece In Place			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Add the current piece to the 	║
-;	║	game field so itll lock in place║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Add the current piece to the game field so itll lock in place.
 proc LockPieceInPlace
 	pusha
 
@@ -1490,18 +1247,9 @@ proc LockPieceInPlace
 	ret
 endp LockPieceInPlace
 
-;	╔═══════════════════════════╗
-;	║	  			Random				║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Get a random number in range	║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	max					 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	ax = random number				║
-;	╚═══════════════════════════╝
+; Get a random number in range.
+; @param max The maximum of the random number (0-max).
+; @ret ax=randomNumber
 proc Random
 	; Save BP
 	push bp
@@ -1546,19 +1294,7 @@ proc Random
 	ret 2
 endp Random
 
-;	╔═══════════════════════════╗
-;	║	  		 Check Lines			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Check for full lines around 	║
-;	║	the current piece		  		║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	none				 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Check for full lines around the current piece. (Static)
 proc CheckLines
 	pusha
 	
@@ -1629,19 +1365,8 @@ proc CheckLines
 	ret
 endp CheckLines
 
-;	╔═══════════════════════════╗
-;	║	  	   Move Lines Down			║
-;	╠═══════════════════════════╣
-;	║ Description:						║
-;	║	Moves all the lines above the 	║
-;	║	given line one down		  		║
-;	╟───────────────────────────╢
-;	║ Input:							║
-;	║	lineNumber			 			║
-;	╟───────────────────────────╢
-;	║ Return:							║
-;	║	none							║
-;	╚═══════════════════════════╝
+; Moves all the lines above the given line one down.
+; @param lineNumber The line.
 proc MoveLinesDown
 	; Save bp
 	push bp
