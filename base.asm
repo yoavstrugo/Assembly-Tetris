@@ -118,6 +118,7 @@ backgroundColor equ 0h
 	pieceToIncreaseDiff db 8
 
 ;====== Numbers =======
+ numbers 	db 0, 0, 0, 0, 0, 0, 0, 0, 0
  					db 0, 0, 0, 0, 0, 0, 0, 0, 0
  					db 0, 0, 0, 0, 0, 0, 0, 0, 0
  					db 0, 0, 0, 0, 0, 0, 0, 0, 0
