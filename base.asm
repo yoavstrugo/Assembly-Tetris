@@ -116,6 +116,7 @@ backgroundColor equ 0h
 	gameSpeedCount db 0
 	linesToRemove db 4 dup('-')
 	pieceToIncreaseDiff db 8
+	score dw 54321
 
 ;====== Numbers =======
  numbers 	db 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -133,20 +134,20 @@ backgroundColor equ 0h
  					db 0, 0, 0, 0, 0, 0, 0, 0, 0
  					db 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-					db 1, 1, 0, 0, 0, 0, 0, 0, 0
-					db 1, 1, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
-					db 0, 0, 0, 0, 0, 0, 0, 0, 0
+					db 1, 1, 1, 1, 1, 1, 1, 1, 1
+					db 1, 1, 1, 1, 1, 1, 1, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 0, 0, 0, 0, 0, 0, 0, 1, 1
 
  					db 1, 1, 1, 1, 1, 1, 1, 1, 1
  					db 1, 1, 1, 1, 1, 1, 1, 1, 1
@@ -469,6 +470,9 @@ proc CopyBitmap
 	; Get parameters
 	mov si, [bp+6]
 	mov bx, [si] ; filehandle
+	
+	xPos equ [bp+10]
+	yPos equ [bp+8]
 
 	scrLineVar equ [bp+4]
 
@@ -478,7 +482,8 @@ proc CopyBitmap
 	;mov bx, [filehandle]
 	mov ax, 0A000h
 	mov es, ax
-	mov cx,199
+	mov cx,yPos
+	dec cx
 	PrintBMPLoop:
 		push cx
 		; di = cx*320, point to the correct screen line
@@ -494,7 +499,7 @@ proc CopyBitmap
 		jc @@OpenError
 		; Copy one line into video memory
 		cld ; Clear direction flag, for movsb
-		mov cx,320
+		mov cx,xPos
 		mov si, scrLineVar
 		rep movsb ; Copy line to the screen
 		 ;rep movsb is same as the following code :
@@ -509,14 +514,14 @@ proc CopyBitmap
 	; Retrive registers
 	popa
 	pop bp
-	ret 4
+	ret 6
 
 	@@OpenError:
 		push ax ; Push the error code
 		call Error
 	popa
 	pop bp
-	ret 4
+	ret 8
 endp CopyBitmap
 
 ; Draw an array.
@@ -767,6 +772,8 @@ proc InitiallizeBackgroundImage
 	push offset Palette
 	call ReadPalette
 
+	push 320
+	push 200
 	push offset filehandle
 	push offset ScrLine
 	call CopyBitmap
@@ -953,7 +960,7 @@ endp Render
 ; @param pieceRotation The rotation of the piece.
 ; @param tetrominoX The X position of the piece.
 ; @param tetrominoY The Y position of the piece.
-;	@ret ax=0-false,1-true
+; @ret ax=0-false,1-true
 proc DoesPieceFit
 	; Save BP
 	push bp
@@ -1466,6 +1473,79 @@ proc MoveLinesDown
 	ret 2
 endp MoveLinesDown
 
+; Print the score. (Static)
+proc PrintScore
+	; Save bp
+	push bp
+	; Get access to stack 
+	mov bp, sp
+
+	pusha
+	push 10
+	push 10
+	call MoveCursor
+	mov ax, [word ptr score]
+	mov bx, 10
+	@@PrintLoop:	
+		div bx ; Modulo is in ax
+		add dx, 30h
+		push dx
+		call PrintASCII
+		cmp ax, 0
+		jne @@PrintLoop
+
+	popa
+	pop bp
+	ret
+endp PrintScore
+
+; Move the cursor to a position
+; @param xPos The X position
+; @param yPos The Y position
+proc MoveCursor
+	; Save bp
+	push bp
+	; Get access to stack 
+	mov bp, sp
+
+	pusha
+
+	yPos equ [bp+4]
+	xPos equ [bp+6]
+
+	mov ah, 02h
+	mov bh, 0
+	mov dh, yPos
+	mov al, xPos
+	int 10h
+
+	popa
+	pop bp
+	ret 4
+endp MoveCursor
+
+; Print a ascii code
+; @param asciiCode The ascii code you want to print
+proc PrintASCII
+	; Save bp
+	push bp
+	; Get access to stack 
+	mov bp, sp
+
+	pusha
+
+	ascii equ [bp+4]
+
+	mov ah, 0Eh
+	mov al, ascii
+	mov bh, 0
+	mov bl, 07h
+	int 10h
+
+	popa
+	pop bp
+	ret 2
+endp PrintASCII
 start:
 	mov ax, @data
 	mov ds, ax
@@ -1474,6 +1554,8 @@ start:
 
 	mov ax, 13h
 	int 10h ; Change to graphics mode
+	
+
 
 	; Initiallize Game
 	call InitiallizeBackgroundImage
@@ -1482,10 +1564,12 @@ start:
 
 	call InitiallizeRandom		
 
+	call PrintScore
 	push 7
 	call Random
 	add ax, 1
 	mov [tetrominoID], ax
+
 
 	@@GameLoop:
 
@@ -1767,6 +1851,7 @@ start:
 			popa
 
 			call Render
+			call PrintScore
 		jmp @@GameLoop
 
 	@@GameOver:	
