@@ -116,53 +116,158 @@ backgroundColor equ 0h
 	gameSpeedCount db 0
 	linesToRemove db 4 dup('-')
 	pieceToIncreaseDiff db 8
-	score dw 54321
+	score dw 0
 
 ;====== Numbers =======
- numbers 	db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
- 					db 0, 0, 0, 0, 0, 0, 0, 0, 0
+ numbers 	db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
 
-					db 1, 1, 1, 1, 1, 1, 1, 1, 1
-					db 1, 1, 1, 1, 1, 1, 1, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
-					db 0, 0, 0, 0, 0, 0, 0, 1, 1
+					db 03h, 03h, 1Fh, 1Fh, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 1Fh, 1Fh, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 03h, 03h, 03h, 03h, 1Fh, 1Fh, 03h, 03h, 03h
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
 
- 					db 1, 1, 1, 1, 1, 1, 1, 1, 1
- 					db 1, 1, 1, 1, 1, 1, 1, 1, 1
- 					db 1, 1, 0, 0, 0, 0, 0, 0, 0
- 					db 1, 1, 0, 0, 0, 0, 0, 0, 0
- 					db 1, 1, 0, 0, 0, 0, 0, 0, 0
- 					db 1, 1, 0, 0, 0, 0, 0, 0, 0
- 					db 1, 1, 1, 1, 1, 1, 1, 1, 1
- 					db 1, 1, 1, 1, 1, 1, 1, 1, 1
- 					db 0, 0, 0, 0, 0, 0, 0, 1, 1
- 					db 0, 0, 0, 0, 0, 0, 0, 1, 1
- 					db 0, 0, 0, 0, 0, 0, 0, 1, 1
- 					db 0, 0, 0, 0, 0, 0, 0, 1, 1
- 					db 1, 1, 1, 1, 1, 1, 1, 1, 1
- 					db 1, 1, 1, 1, 1, 1, 1, 1, 1
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+
+ 					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+ 					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+ 					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+ 					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+ 					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+ 					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+ 					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+ 					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+ 					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+ 					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+ 					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+ 					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+ 					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					 
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 03h, 03h
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
+					db 03h, 03h, 03h, 03h, 03h, 03h, 03h, 1Fh, 1Fh
 
 ;======= Text =======
 cursor db 18 dup(1Fh)
@@ -1481,71 +1586,43 @@ proc PrintScore
 	mov bp, sp
 
 	pusha
-	push 10
-	push 10
-	call MoveCursor
+	
+	xPos equ si
+	mov xPos, 278 ; Starting position
+
 	mov ax, [word ptr score]
 	mov bx, 10
+	mov cx, 5
 	@@PrintLoop:	
-		div bx ; Modulo is in ax
-		add dx, 30h
-		push dx
-		call PrintASCII
-		cmp ax, 0
-		jne @@PrintLoop
+		xor dx, dx
+		div bx ; Modulo is in dx, division in ax
+
+		push ax
+		push bx
+
+		; Draw dx
+		mov ax, dx
+		mov bl, 126 ; arr length
+		mul bl
+		add ax, offset numbers
+		push ax
+		push 9 ; width
+		push 14 ; height
+		push xPos ; X pos
+		push 78 ; Y pos
+		call Draw
+
+		pop bx
+		pop ax
+
+		sub xPos, 11 ; The space between the numbers
+		loop @@PrintLoop
 
 	popa
 	pop bp
 	ret
 endp PrintScore
 
-; Move the cursor to a position
-; @param xPos The X position
-; @param yPos The Y position
-proc MoveCursor
-	; Save bp
-	push bp
-	; Get access to stack 
-	mov bp, sp
-
-	pusha
-
-	yPos equ [bp+4]
-	xPos equ [bp+6]
-
-	mov ah, 02h
-	mov bh, 0
-	mov dh, yPos
-	mov al, xPos
-	int 10h
-
-	popa
-	pop bp
-	ret 4
-endp MoveCursor
-
-; Print a ascii code
-; @param asciiCode The ascii code you want to print
-proc PrintASCII
-	; Save bp
-	push bp
-	; Get access to stack 
-	mov bp, sp
-
-	pusha
-
-	ascii equ [bp+4]
-
-	mov ah, 0Eh
-	mov al, ascii
-	mov bh, 0
-	mov bl, 07h
-	int 10h
-
-	popa
-	pop bp
-	ret 2
-endp PrintASCII
 start:
 	mov ax, @data
 	mov ds, ax
@@ -1564,12 +1641,10 @@ start:
 
 	call InitiallizeRandom		
 
-	call PrintScore
 	push 7
 	call Random
 	add ax, 1
 	mov [tetrominoID], ax
-
 
 	@@GameLoop:
 
@@ -1695,9 +1770,6 @@ start:
 					in al, 60h
 					cmp al, escKey
 					je exit
-		
-		
-			
 
 				@@NothingPressed:
 
@@ -1840,7 +1912,7 @@ start:
 						mov al, [linesToRemove+bx]
 						push ax
 						call MoveLinesDown
-
+						add [score], 100
 						mov [linesToRemove+bx], '-'
 
 					@@Next:
