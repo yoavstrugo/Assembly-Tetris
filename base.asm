@@ -111,11 +111,11 @@ backgroundColor equ 0h
 	prevX dw 1
 
 ;======= Game Vars =======
-	gameSpeed db 15
+	gameSpeed db 10
 	pieceCount dw 0
 	gameSpeedCount db 0
 	linesToRemove db 4 dup('-')
-	pieceToIncreaseDiff db 8
+	pieceToIncreaseDiff db 5
 	score dw 0
 
 ;====== Numbers =======
@@ -280,7 +280,9 @@ cursorBlinkSpeed db 9
 ;======= Files =======
 	paletteImg db 'palette.bmp', 0
 	bgImg db 'gameBG.bmp',0
-	filehandle dw ?;
+	openingScreen db 'openScrn.bmp',0
+	pressSpace db 'prsSpc.bmp', 0
+	filehandle dw ?
 	Header db 54 dup (0)
 	Palette db 256*4 dup (0)
 	ScrLine db 320 dup (0)
