@@ -563,6 +563,10 @@ proc CopyPal
 endp CopyPal
 
 ; Copies a bmp image to the screen.
+; @param width The width of the image.
+; @param height The height of the image.
+; @param xPos Where to print the image on the X axis.
+; @param yPos Where to print the image on the Y axis.
 ; @param fileHandle The file handle.
 ; @param palette The palette.
 proc CopyBitmap
@@ -579,49 +583,59 @@ proc CopyBitmap
 	mov bx, [si] ; filehandle
 	
 	xPos equ [bp+10]
-	yPos equ [bp+8]
+	;yPos equ [bp+8]
+
+	imageWidth equ [bp+14]
+	imageHeight equ [bp+12]
 
 	scrLineVar equ [bp+4]
 
 	; BMP graphics are saved upside-down .
 	; Read the graphic line by line (200 lines in VGA format),
 	; displaying the lines from bottom to top.
-	;mov bx, [filehandle]
+
 	mov ax, 0A000h
 	mov es, ax
-	mov cx,yPos
-	dec cx
+
+	yPos equ dx
+	mov yPos, [bp+8]
+
+	mov cx,imageHeight
+	;dec cx
 	PrintBMPLoop:
 		push cx
+		push yPos
+
 		; di = cx*320, point to the correct screen line
-		mov di,cx
-		shl cx,6
+		mov di,yPos
+		shl yPos,6
 		shl di,8
-		add di,cx
+		add di,yPos
+		add di, xPos
+
 		; Read one line
 		mov ah,3fh
-		mov cx,320
+		mov cx, imageWidth
 		mov dx, scrLineVar
 		int 21h
+
 		jc @@OpenError
 		; Copy one line into video memory
 		cld ; Clear direction flag, for movsb
-		mov cx,xPos
+		mov cx,imageWidth
+		dec cx
 		mov si, scrLineVar
 		rep movsb ; Copy line to the screen
-		 ;rep movsb is same as the following code :
-		 ;mov es:di, ds:si
-		 ;inc si
-		 ;inc di
-		 ;dec cx
-		 ;loop until cx=0
+
+		pop yPos
+		dec yPos
 		pop cx
 		loop PrintBMPLoop
 
 	; Retrive registers
 	popa
 	pop bp
-	ret 6
+	ret 12
 
 	@@OpenError:
 		push ax ; Push the error code
@@ -879,6 +893,8 @@ proc InitiallizeBackgroundImage
 	push offset Palette
 	call ReadPalette
 
+	push 320
+	push 200
 	push 320
 	push 200
 	push offset filehandle
@@ -1634,8 +1650,64 @@ start:
 	mov ax, 13h
 	int 10h ; Change to graphics mode
 	
+	; Load Background
+	push offset openingScreen
+	push offset filehandle
+	call OpenFile
 
+	push offset filehandle
+	push offset Header
+	call ReadHeader
 
+	push offset filehandle
+	push offset Palette
+	call ReadPalette
+
+	push offset filehandle
+	push offset Palette
+	call CopyPal
+
+	push 320
+	push 200
+	push 0
+	push 200
+	push offset filehandle
+	push offset ScrLine
+	call CopyBitmap
+
+	push offset filehandle
+	call CloseFile
+
+	; Open press space
+
+	push offset pressSpace
+	push offset filehandle
+	call OpenFile
+
+	push offset filehandle
+	push offset Header
+	call ReadHeader
+
+	push offset filehandle
+	push offset Palette
+	call ReadPalette
+
+	push offset filehandle
+	push offset Palette
+	call CopyPal
+
+	push 156
+	push 14
+	push 83
+	push 139
+	push offset filehandle
+	push offset ScrLine
+	call CopyBitmap
+
+	push offset filehandle
+	call CloseFile
+
+	jmp exit
 	; Initiallize Game
 	call InitiallizeBackgroundImage
 	call InitiallizeGamePalette
