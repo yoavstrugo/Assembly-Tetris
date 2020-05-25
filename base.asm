@@ -395,6 +395,7 @@ proc OpenFile
 	mov si, [bp+4] ; File handler
 
 	; Open the given file
+	mov cx, 0
 	mov ah, 3Dh	; Open file
 	xor al, al	; We want to read the file
 	int 21h		; DOS interupt
@@ -895,8 +896,8 @@ proc InitiallizeBackgroundImage
 
 	push 320
 	push 200
-	push 320
-	push 200
+	push 0
+	push 199
 	push offset filehandle
 	push offset ScrLine
 	call CopyBitmap
@@ -1670,7 +1671,7 @@ start:
 	push 320
 	push 200
 	push 0
-	push 200
+	push 199
 	push offset filehandle
 	push offset ScrLine
 	call CopyBitmap
@@ -1706,7 +1707,6 @@ start:
 
 	push offset filehandle
 	call CloseFile
-
 	jmp exit
 	; Initiallize Game
 	call InitiallizeBackgroundImage
