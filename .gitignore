@@ -3,6 +3,7 @@
 
 # But the project files
 !base.asm
+!file.asm
 !palette.bmp
 !gameBG.bmp
 !run.bat
