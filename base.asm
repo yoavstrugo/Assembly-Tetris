@@ -56,7 +56,7 @@ gameField 	db 252 dup(0)
 	gameFieldX equ 90
 	gameFieldY equ 0
 	gameFieldLength equ 252
-				
+
 tetrominoes		db 	0, 	1, 	0, 	0
 				db	0, 	1,	0, 	0
 				db	0, 	1,	1, 	0
@@ -309,6 +309,7 @@ cursorBlinkSpeed db 9
 	ten db 10
 
 CODESEG
+include "file.asm"
 ; Prints the error. (INT 21) 
 ; @param errorCode The error code you want to print
 proc Error
@@ -1645,7 +1646,7 @@ endp PrintScore
 start:
 	mov ax, @data
 	mov ds, ax
-
+	call TestProc
 	@@GameStart:
 
 	mov ax, 13h
