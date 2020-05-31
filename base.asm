@@ -276,6 +276,11 @@ showCursor db 1
 cursorBlinkCount db 0
 cursorBlinkSpeed db 9 
 
+;======= Animation =======
+pressSpaceOff db 155*14 dup (03h)
+showPressSpace db 1
+pressSpaceBlinkCount db 0
+pressSpaceBlinkSpeed db 9 
 
 ;======= Files =======
 	paletteImg db 'palette.bmp', 0
@@ -309,7 +314,6 @@ cursorBlinkSpeed db 9
 	ten db 10
 
 CODESEG
-include "file.asm"
 ; Prints the error. (INT 21) 
 ; @param errorCode The error code you want to print
 proc Error
@@ -570,7 +574,7 @@ endp CopyPal
 ; @param xPos Where to print the image on the X axis.
 ; @param yPos Where to print the image on the Y axis.
 ; @param fileHandle The file handle.
-; @param palette The palette.
+; @param screenLine Stores the screen line
 proc CopyBitmap
 	; Save BP
 	push bp
@@ -646,6 +650,64 @@ proc CopyBitmap
 	pop bp
 	ret 8
 endp CopyBitmap
+
+; Project an image to the screen.
+; @param fileName The name of the file
+; @param fileHandle The file handle
+; @param headerOutput Where to store the header	
+; @param paletteOutput Where to store the palette
+; @param screenLine Stores the screen line
+; @param width The width of the image.
+; @param height The height of the image.
+; @param xPos Where to print the image on the X axis.
+; @param yPos Where to print the image on the Y axis.
+proc ProjectImage
+	push bp
+	mov bp, sp
+	pusha
+
+	fileNameLoc equ [bp+20]
+	fileHandleLoc equ [bp+18]
+	headerOutputLoc equ [bp+16]
+	paletteOutputLoc equ [bp+14]
+	screenLineLoc equ [bp+12]
+	widthLoc equ [bp+10]
+	heightLoc equ [bp+8]
+	xPosLoc equ [bp+6]
+	yPosLoc equ [bp+4]
+
+	; Load Background
+	push fileNameLoc
+	push fileHandleLoc
+	call OpenFile
+
+	push fileHandleLoc
+	push headerOutputLoc
+	call ReadHeader
+
+	push fileHandleLoc
+	push paletteOutputLoc
+	call ReadPalette
+
+	push fileHandleLoc
+	push paletteOutputLoc
+	call CopyPal
+
+	push widthLoc
+	push heightLoc
+	push xPosLoc
+	push yPosLoc
+	push fileHandleLoc
+	push screenLineLoc
+	call CopyBitmap
+
+	push fileHandleLoc
+	call CloseFile
+
+	popa
+	pop bp
+	ret 18
+endp ProjectImage
 
 ; Draw an array.
 ; @param array The array you want to draw (matrix).
@@ -879,34 +941,6 @@ proc FillBlock
 	pop bp
 	ret 6
 endp FillBlock
-
-; Initiallizes the background image. (Static)
-proc InitiallizeBackgroundImage
-	; Load Background
-	push offset bgImg
-	push offset filehandle
-	call OpenFile
-
-	push offset filehandle
-	push offset Header
-	call ReadHeader
-
-	push offset filehandle
-	push offset Palette
-	call ReadPalette
-
-	push 320
-	push 200
-	push 0
-	push 199
-	push offset filehandle
-	push offset ScrLine
-	call CopyBitmap
-
-	push offset filehandle
-	call CloseFile
-	ret
-endp InitiallizeBackgroundImage
 
 ; Initiallizes the color palette of the game. (Static)
 proc InitiallizeGamePalette
@@ -1645,72 +1679,85 @@ endp PrintScore
 
 start:
 	mov ax, @data
-	mov ds, ax
-	call TestProc
+	mov ds, ax	
 	@@GameStart:
 
 	mov ax, 13h
 	int 10h ; Change to graphics mode
 	
-	; Load Background
-	push offset openingScreen
-	push offset filehandle
-	call OpenFile
+	; Load Opening Screen
+	push offset openingScreen ; The name of the file
+	push offset filehandle ; The file handle
+	push offset Header ; Sores the header
+	push offset Palette ; Stores the palette
+	push offset ScrLine ; Stores the screen line
+	push 320 ; The width of the image
+	push 200 ; The height of the image
+	push 0 ; The x position
+	push 199 ; The y position
+	call ProjectImage
 
-	push offset filehandle
-	push offset Header
-	call ReadHeader
+	@@PressSpace:
+		;Before each loop we wait a certain time -> game tick
+		xor al, al ; if al won't be 0 then this int will mess with the memory
+		mov ah, 86h
+		xor cx, cx
+		mov dx, 0C350h 	; CX:DX microseconds (=1,000,000ths of a second)
+		int 15h			; 0000C350h = 50,000 = 50ms
+		
+		
+		inc [pressSpaceBlinkCount]
+		mov al, [byte ptr pressSpaceBlinkCount]
+		cmp al, [byte ptr pressSpaceBlinkSpeed]
+		jne @@CheckSpace
+		not [showPressSpace]
 
-	push offset filehandle
-	push offset Palette
-	call ReadPalette
+		cmp [showPressSpace], 1
+		jne @@HidePressSpace
 
-	push offset filehandle
-	push offset Palette
-	call CopyPal
+		; Open press space
+		push offset pressSpace ; The name of the file
+		push offset filehandle ; The file handle
+		push offset Header ; Sores the header
+		push offset Palette ; Stores the palette
+		push offset ScrLine ; Stores the screen line
+		push 156 ; The width of the image
+		push 14 ; The height of the image
+		push 83 ; The x position
+		push 139 ; The y position
+		call ProjectImage
+		jmp @@CheckSpace
 
-	push 320
-	push 200
-	push 0
-	push 199
-	push offset filehandle
-	push offset ScrLine
-	call CopyBitmap
+		@@HidePressSpace:
+		push offset pressSpaceOff
+		push 155
+		push 14
+		push 83
+		push 139
+		call Draw
+		mov [showPressSpace], 1 
+		mov [pressSpaceBlinkCount], 0
 
-	push offset filehandle
-	call CloseFile
+		@@CheckSpace:
+	jmp @@PressSpace
 
-	; Open press space
 
-	push offset pressSpace
-	push offset filehandle
-	call OpenFile
+	
 
-	push offset filehandle
-	push offset Header
-	call ReadHeader
 
-	push offset filehandle
-	push offset Palette
-	call ReadPalette
-
-	push offset filehandle
-	push offset Palette
-	call CopyPal
-
-	push 156
-	push 14
-	push 83
-	push 139
-	push offset filehandle
-	push offset ScrLine
-	call CopyBitmap
-
-	push offset filehandle
-	call CloseFile
-	jmp exit
 	; Initiallize Game
-	call InitiallizeBackgroundImage
+	; Show the background image
+	push offset bgImg ; The name of the file
+	push offset filehandle ; The file handle
+	push offset Header ; Sores the header
+	push offset Palette ; Stores the palette
+	push offset ScrLine ; Stores the screen line
+	push 320 ; The width of the image
+	push 200 ; The height of the image
+	push 0 ; The x position
+	push 199 ; The y position
+	call ProjectImage
+
 	call InitiallizeGamePalette
 	call InitiallizeGameField
 
