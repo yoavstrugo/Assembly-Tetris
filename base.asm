@@ -26,28 +26,6 @@ gameFieldBuffer db 36 dup(?)
 
 gameField 	db 252 dup(0)
 
-;gameField 	db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8
-;			db 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
-
 
 ;======= Game Field Constants =======
 	gameFieldBufferHeight equ 3
@@ -100,7 +78,6 @@ tetrominoes		db 	0, 	1, 	0, 	0
 	tetrominoID dw 3 ; 1 = L, 2 = J, 3 = S, 4 = I, 5 = Z, 6 = O, 7 = T
 	canRotate db 1 ; 1 = true, 0 = false
 
-
 BlockSize equ 10
 backgroundColor equ 0h
 
@@ -117,6 +94,7 @@ backgroundColor equ 0h
 	linesToRemove db 4 dup('-')
 	pieceToIncreaseDiff db 5
 	score dw 0
+	scoreFactor dw 0
 
 ;====== Numbers =======
  numbers 	db 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh, 1Fh
@@ -277,10 +255,11 @@ cursorBlinkCount db 0
 cursorBlinkSpeed db 9 
 
 ;======= Animation =======
-pressSpaceOff db 155*14 dup (03h)
-showPressSpace db 1
-pressSpaceBlinkCount db 0
-pressSpaceBlinkSpeed db 9 
+underLine db 42 dup(04h);
+underLineOff db 42 dup (03h)
+showUnderLine db 1
+underLineBlinkCount db 0
+underLineBlinkSpeed db 15
 
 ;======= Files =======
 	paletteImg db 'palette.bmp', 0
@@ -942,7 +921,7 @@ proc FillBlock
 	ret 6
 endp FillBlock
 
-; Initiallizes the color palette of the game. (Static)
+; Initiallizes the color palette of the game.
 proc InitiallizeGamePalette
 	; Load the games color palette
 
@@ -967,7 +946,7 @@ proc InitiallizeGamePalette
 	ret
 endp InitiallizeGamePalette
 
-; Initiallizes the game field array. (Static)
+; Initiallizes the game field array. 
 proc InitiallizeGameField
 	pusha
 	
@@ -1024,7 +1003,7 @@ proc InitiallizeGameField
 	ret
 endp InitiallizeGameField
 
-; Initiallizes the PRNG, sets x0 (Static)
+; Initiallizes the PRNG, sets x0 
 proc InitiallizeRandom
 	pusha 
 
@@ -1040,7 +1019,7 @@ proc InitiallizeRandom
 	ret
 endp InitiallizeRandom
 
-; Renders the screen array. (Static)
+; Renders the screen array.
 proc Render
 	pusha
 
@@ -1316,7 +1295,7 @@ proc GetCellOffset
 	ret 8
 endp GetCellOffset
 
-; Draws the current piece into the screen array. (Static)
+; Draws the current piece into the screen array.
 proc DrawCurrentPiece
 	pusha
 
@@ -1453,7 +1432,7 @@ proc LockPieceInPlace
 		pop cx ; Retrive CX
 		pop pieceX
 		loop @@VerticalLoop
-
+	add [score], 40
 	popa
 	ret
 endp LockPieceInPlace
@@ -1632,7 +1611,10 @@ proc MoveLinesDown
 	ret 2
 endp MoveLinesDown
 
-; Print the score. (Static)
+; Print the score.
+; @param number The number you want to print
+; @param xPos The x position of the number
+; @param yPos The y position of the number
 proc PrintScore
 	; Save bp
 	push bp
@@ -1642,9 +1624,11 @@ proc PrintScore
 	pusha
 	
 	xPos equ si
-	mov xPos, 278 ; Starting position
+	mov xPos, [bp+6] ; Starting position
+	
+	yPos equ [bp+4]
 
-	mov ax, [word ptr score]
+	mov ax, [bp+8]
 	mov bx, 10
 	mov cx, 5
 	@@PrintLoop:	
@@ -1663,7 +1647,7 @@ proc PrintScore
 		push 9 ; width
 		push 14 ; height
 		push xPos ; X pos
-		push 78 ; Y pos
+		push yPos ; Y pos
 		call Draw
 
 		pop bx
@@ -1674,17 +1658,39 @@ proc PrintScore
 
 	popa
 	pop bp
-	ret
+	ret 6
 endp PrintScore
 
-start:
-	mov ax, @data
-	mov ds, ax	
-	@@GameStart:
+; Calculate the power
+; @param base The base
+; @param exponent The exponent
+; @ret ax=result
+proc Power
+	; Save bp
+	push bp
+	; Get access to stack 
+	mov bp, sp
 
-	mov ax, 13h
-	int 10h ; Change to graphics mode
+	push bx
+	push cx
 	
+	base equ [bp+6]
+	exponent equ [bp+4]
+
+	mov cx, exponent
+	mov ax, 1
+	mov bl, base
+	@@PowerLoop:
+		mul bl
+		loop @@PowerLoop
+
+	pop cx
+	pop bx
+	pop bp
+	ret 4
+endp Power
+
+proc handleOpeningScreen
 	; Load Opening Screen
 	push offset openingScreen ; The name of the file
 	push offset filehandle ; The file handle
@@ -1697,24 +1703,6 @@ start:
 	push 199 ; The y position
 	call ProjectImage
 
-	@@PressSpace:
-		;Before each loop we wait a certain time -> game tick
-		xor al, al ; if al won't be 0 then this int will mess with the memory
-		mov ah, 86h
-		xor cx, cx
-		mov dx, 0C350h 	; CX:DX microseconds (=1,000,000ths of a second)
-		int 15h			; 0000C350h = 50,000 = 50ms
-		
-		
-		inc [pressSpaceBlinkCount]
-		mov al, [byte ptr pressSpaceBlinkCount]
-		cmp al, [byte ptr pressSpaceBlinkSpeed]
-		jne @@CheckSpace
-		not [showPressSpace]
-
-		cmp [showPressSpace], 1
-		jne @@HidePressSpace
-
 		; Open press space
 		push offset pressSpace ; The name of the file
 		push offset filehandle ; The file handle
@@ -1726,25 +1714,389 @@ start:
 		push 83 ; The x position
 		push 139 ; The y position
 		call ProjectImage
+
+	@@PressSpace:
+		;Before each loop we wait a certain time -> game tick
+		xor al, al ; if al won't be 0 then this int will mess with the memory
+		mov ah, 86h
+		xor cx, cx
+		mov dx, 0C350h 	; CX:DX microseconds (=1,000,000ths of a second)
+		int 15h			; 0000C350h = 50,000 = 50ms
+		
+		
+		inc [underLineBlinkCount]
+		mov al, [byte ptr underLineBlinkCount]
+		cmp al, [byte ptr underLineBlinkSpeed]
+		jne @@CheckSpace
+		not [showUnderLine]
+
+		cmp [showUnderLine], 1
+		jne @@HidePressSpace
+
+		; Open press space
+		push offset underLine
+		push 42
+		push 1
+		push 129
+		push 139
+		call Draw
+		mov [underLineBlinkCount], 0
 		jmp @@CheckSpace
 
 		@@HidePressSpace:
-		push offset pressSpaceOff
-		push 155
-		push 14
-		push 83
+		push offset underLineOff
+		push 42
+		push 1
+		push 129
 		push 139
 		call Draw
-		mov [showPressSpace], 1 
-		mov [pressSpaceBlinkCount], 0
+		mov [underLineBlinkCount], 0
 
 		@@CheckSpace:
+				in al, 60h
+				cmp al, spaceDownKey
+				je @@StartGame
 	jmp @@PressSpace
 
+	@@StartGame:
+		ret
+endp handleOpeningScreen
 
-	
+; The loop of the game
+proc GameLoop
+	@@GameLoop:
+		; Manage the timing of the game
+		call GameTiming
+		
+		; Manage the input from the use
+		call GameInput
+			
+		; Manager the logic of the game
+		call GameLogic
+
+		; Check if faild
+		cmp ax, 1
+		je @@GameOver
+
+		; Manager the rendering of the game
+		call GameRender
+
+		jmp @@GameLoop
+		
+	@@GameOver:
+		ret
+endp GameLoop
+
+; The game timing
+proc GameTiming
+	;Before each loop we wait a certain time -> game tick
+	xor al, al ; if al won't be 0 then this int will mess with the memory
+	mov ah, 86h
+	xor cx, cx
+	mov dx, 0C350h 	; CX:DX microseconds (=1,000,000ths of a second)
+	int 15h			; 0000C350h = 50,000 = 50ms
+
+	; Increase speed count
+	inc [gameSpeedCount]
+	ret
+endp GameTiming
+
+; The game input
+proc GameInput
+	cmp [tetrominoY], -1
+	jl @@NothingPressed ; Cant move before the piece enters the field
+
+	in al, 64h
+	cmp al, 10b
+	je @@NothingPressed
+
+;====== Space (Rotate) ======
+	; If space is up
+	in al, 60h
+	cmp al, spaceUpKey
+	jne @@NoSwap
+
+	mov [canRotate], 1
+
+	@@NoSwap:
+	; If space is down
+	in al, 60h
+	cmp al, spaceDownKey
+	jne @@NoRotate
+	cmp [canRotate], 1
+	jne @@NoRotate ; lock space so player need to release it before clicking again
+
+	push [tetrominoID] ; Piece ID
+	mov ax, [tetrominoRotation] ; Piece rotation
+	add ax, 1
+	push ax ; Rotation + 1
+	push [tetrominoX]
+	push [tetrominoY] ; Piece Y
+	call DoesPieceFit ; ax = DoesPieceFit
+	cmp ax, 1 ; Check if can move
+	jne @@NoRotate
+
+	inc [tetrominoRotation]
+	mov [gameSpeedCount], 0
+
+	mov [canRotate], 0
+
+@@NoRotate:
+
+;====== Arrows (Movement) ======
+	; Left
+		; Left arrow
+		in al, 60h
+		cmp al, leftKey
+		jne @@NoLeft
+
+		push [tetrominoID] ; Piece ID
+		push [tetrominoRotation] ; Piece rotation
+		mov ax, [tetrominoX]
+		dec ax
+		push ax ; Piece X - 1 (Left)
+		push [tetrominoY] ; Piece Y
+
+		call DoesPieceFit ; ax = DoesPieceFit
+
+		cmp ax, 1 ; Check if can move
+		jne @@NoLeft
+
+		dec [tetrominoX]
+		mov [gameSpeedCount], 0
+
+	@@NoLeft:
+
+		; Right arrow
+		in al, 60h
+		cmp al, rightKey
+		jne @@NoRight
+
+		push [tetrominoID] ; Piece ID
+		push [tetrominoRotation] ; Piece rotation
+		mov ax, [tetrominoX]
+		inc ax
+		push ax ; Piece X + 1 (Right)
+		push [tetrominoY] ; Piece Y
+		call DoesPieceFit ; ax = DoesPieceFit
+		cmp ax, 1 ; Check if can move
+		jne @@NoRight
+
+		inc [tetrominoX]
+		mov [gameSpeedCount], 0
+
+	@@NoRight:
+
+		; Down arrow
+		in al, 60h
+		cmp al, downKey
+		jne @@NoDown
+
+		push [tetrominoID] ; Piece ID
+		push [tetrominoRotation] ; Piece rotation
+		push [tetrominoX] ; Piece X
+		mov ax, [tetrominoY]
+		inc ax
+		push ax ; Piece Y + 1 (Down)
+		call DoesPieceFit ; ax = DoesPieceFit
+		cmp ax, 1 ; Check if can move
+		jne @@NoDown
+
+		inc [tetrominoY]
+		mov [gameSpeedCount], 0
+
+	@@NoDown:
+
+	;====== Escape (Exit) ======
+		; If escape is pressed
+		in al, 60h
+		cmp al, escKey
+		je exit
+
+	@@NothingPressed:
+	ret
+endp GameInput
+
+; The game logic
+; @ret ax=didFail
+proc GameLogic
+	; Check if force down
+	mov al, [gameSpeedCount]
+	cmp al, [gameSpeed]
+	jne @@AfterForceDown
+
+	mov [gameSpeedCount], 0
+
+	; Need to force down
+	; first check if piece can go down
+	push [tetrominoID] ; Piece ID
+	push [tetrominoRotation] ; Piece rotation
+	push [tetrominoX] ; Piece X
+	mov ax, [tetrominoY]
+	inc ax
+	push ax ; Piece Y + 1 (Down)
+	call DoesPieceFit ; ax = DoesPieceFit
+	cmp ax, 1 ; Check if can move
+	je @@ForceDown ; piece cant go down then it reached it's final position
+
+	; Lock piece in place
+	call LockPieceInPlace
+
+	; Check for lines
+	call CheckLines
+
+	; Pick new piece
+	mov [tetrominoX], 3
+	mov [tetrominoY], -3
+
+	push 7
+	call Random
+	add ax, 1
+
+	mov [tetrominoID], ax
+	mov [tetrominoRotation], 0
+
+	inc [pieceCount]
+	mov ax, [pieceCount]
+	div [pieceToIncreaseDiff]
+	cmp ah, 0 ; If the modulu is 0 then increase difficulty
+	jne @@DontIncreaseDifficulty
+
+	cmp [gameSpeed], 2
+	jbe @@DontIncreaseDifficulty ; Dont make the game impossible
+
+	dec [gameSpeed]; Increase difficulty
+
+	@@DontIncreaseDifficulty:
 
 
+	; If new piece doesn't fit then game over
+	push [tetrominoID] ; Piece ID
+	push [tetrominoRotation] ; Piece rotation
+	push [tetrominoX] ; Piece X
+	mov ax, [tetrominoY]
+	inc ax
+	push ax ; Piece Y + 1 (Down)
+	call DoesPieceFit ; ax = DoesPieceFit
+	cmp ax, 0
+	je @@GameOver
+
+	jmp @@AfterForceDown
+	@@ForceDown:
+		inc [tetrominoY]
+		mov [gameSpeedCount], 0
+	@@AfterForceDown:
+	mov ax, 0
+	ret
+	@@GameOver:
+	mov ax, 1
+	ret
+endp GameLogic
+
+; The game render
+proc GameRender
+	; Cursor animation
+	inc [cursorBlinkCount]
+	mov al, [cursorBlinkCount]
+	cmp al, [cursorBlinkSpeed]
+	jne @@DontBlink
+	mov [cursorBlinkCount], 0
+
+	cmp [showCursor], 1
+	jne @@HideCursor
+
+	@@ShowCursor:
+	push offset cursor
+	push 9
+	push 2
+	push 289
+	push 90
+	call Draw
+	mov [showCursor], 0
+	jmp @@DontBlink
+
+	@@HideCursor:
+	push offset cursorOff
+	push 9
+	push 2
+	push 289
+	push 90
+	call Draw
+	mov [showCursor], 1 
+
+	@@DontBlink:
+	; Send game field to render
+	call DrawGameField
+
+	call DrawCurrentPiece
+
+	; Check if there are any lines to remove
+	pusha 
+	mov cx, 4
+	xor bx, bx
+	@@LineRemoveCheckLoop:
+		cmp [linesToRemove + bx], '-'
+		jne @@RemoveLines; There are lines to remove
+		inc bx
+		loop @@LineRemoveCheckLoop
+		jmp @@DontRemoveLines
+
+	@@RemoveLines:
+		; First, render the unstaurated bricks
+		call Render
+
+		; Wait a bit so the player will see the animation
+		xor al, al ; if al won't be 0 then this int will mess with the memory
+		mov ah, 86h
+		mov cx, 0006h
+		mov dx, 1A80h 	; CX:DX microseconds (=1,000,000ths of a second)
+		int 15h			; 00061A80h = 400,000 = 400ms
+
+		; Remove lines
+		mov cx, 4
+		xor bx, bx
+		mov [scoreFactor], 0 
+		@@RemoveLinesLoop:
+			cmp [linesToRemove+bx], '-'
+			jne @@RemoveLine
+			jmp @@Next
+
+			@@RemoveLine:
+
+				xor ax, ax
+				mov al, [linesToRemove+bx]
+				push ax
+				call MoveLinesDown
+				inc [scoreFactor]
+				mov [linesToRemove+bx], '-'
+
+			@@Next:
+			inc bx
+			loop @@RemoveLinesLoop
+
+	@@DontRemoveLines:
+	popa
+
+	@@AddScore:
+	push 2
+	push [scoreFactor]
+	call Power
+	mov bl, 100
+	mul bl ; ax = (2^scoreFactor) * 100
+	add [score], ax
+	mov [scoreFactor], 0
+
+	call Render
+
+	push [score]
+	push 278
+	push 78
+	call PrintScore
+	ret
+endp GameRender
+
+; Start the game
+proc GameStart
 	; Initiallize Game
 	; Show the background image
 	push offset bgImg ; The name of the file
@@ -1767,291 +2119,28 @@ start:
 	call Random
 	add ax, 1
 	mov [tetrominoID], ax
+	ret
+endp GameStart
 
-	@@GameLoop:
+start:
+	mov ax, @data
+	mov ds, ax	
 
-		@@Timing:
-			;Before each loop we wait a certain time -> game tick
-			xor al, al ; if al won't be 0 then this int will mess with the memory
-			mov ah, 86h
-			xor cx, cx
-			mov dx, 0C350h 	; CX:DX microseconds (=1,000,000ths of a second)
-			int 15h			; 0000C350h = 50,000 = 50ms
+	@@GameStart:
 
-			; Increase speed count
-			inc [gameSpeedCount]
-			
-		
-		@@Input:
-			cmp [tetrominoY], -1
-			jl @@NothingPressed ; Cant move before the piece enters the field
+	mov ax, 13h
+	int 10h ; Change to graphics mode
+	
+	; Show opening screen
+	; when space is pressed 
+	call handleOpeningScreen
 
-			in al, 64h
-			cmp al, 10b
-			je @@NothingPressed
-		
-			;====== Space (Rotate) ======
-				; If space is up
-				in al, 60h
-				cmp al, spaceUpKey
-				jne @@NoSwap
+	; Initiallize the game
+	call GameStart	
 
-				mov [canRotate], 1
+	; Start the game loop
+	call GameLoop
 
-				@@NoSwap:
-				; If space is down
-				in al, 60h
-				cmp al, spaceDownKey
-				jne @@NoRotate
-				cmp [canRotate], 1
-				jne @@NoRotate ; lock space so player need to release it before clicking again
-
-				push [tetrominoID] ; Piece ID
-				mov ax, [tetrominoRotation] ; Piece rotation
-				add ax, 1
-				push ax ; Rotation + 1
-				push [tetrominoX]
-				push [tetrominoY] ; Piece Y
-				call DoesPieceFit ; ax = DoesPieceFit
-				cmp ax, 1 ; Check if can move
-				jne @@NoRotate
-
-				inc [tetrominoRotation]
-				mov [gameSpeedCount], 0
-
-				mov [canRotate], 0
-
-			@@NoRotate:
-		
-			;====== Arrows (Movement) ======
-				; Left
-					; Left arrow
-					in al, 60h
-					cmp al, leftKey
-					jne @@NoLeft
-
-					push [tetrominoID] ; Piece ID
-					push [tetrominoRotation] ; Piece rotation
-					mov ax, [tetrominoX]
-					dec ax
-					push ax ; Piece X - 1 (Left)
-					push [tetrominoY] ; Piece Y
-
-					call DoesPieceFit ; ax = DoesPieceFit
-
-					cmp ax, 1 ; Check if can move
-					jne @@NoLeft
-
-					dec [tetrominoX]
-					mov [gameSpeedCount], 0
-
-				@@NoLeft:
-
-					; Right arrow
-					in al, 60h
-					cmp al, rightKey
-					jne @@NoRight
-
-					push [tetrominoID] ; Piece ID
-					push [tetrominoRotation] ; Piece rotation
-					mov ax, [tetrominoX]
-					inc ax
-					push ax ; Piece X + 1 (Right)
-					push [tetrominoY] ; Piece Y
-					call DoesPieceFit ; ax = DoesPieceFit
-					cmp ax, 1 ; Check if can move
-					jne @@NoRight
-
-					inc [tetrominoX]
-					mov [gameSpeedCount], 0
-
-				@@NoRight:
-
-					; Down arrow
-					in al, 60h
-					cmp al, downKey
-					jne @@NoDown
-
-					push [tetrominoID] ; Piece ID
-					push [tetrominoRotation] ; Piece rotation
-					push [tetrominoX] ; Piece X
-					mov ax, [tetrominoY]
-					inc ax
-					push ax ; Piece Y + 1 (Down)
-					call DoesPieceFit ; ax = DoesPieceFit
-					cmp ax, 1 ; Check if can move
-					jne @@NoDown
-
-					inc [tetrominoY]
-					mov [gameSpeedCount], 0
-
-				@@NoDown:
-
-				;====== Escape (Exit) ======
-					; If escape is pressed
-					in al, 60h
-					cmp al, escKey
-					je exit
-
-				@@NothingPressed:
-
-		@@Logic:
-			; Check if force down
-			mov al, [gameSpeedCount]
-			cmp al, [gameSpeed]
-			jne @@AfterForceDown
-
-			mov [gameSpeedCount], 0
-			
-			; Need to force down
-			; first check if piece can go down
-			push [tetrominoID] ; Piece ID
-			push [tetrominoRotation] ; Piece rotation
-			push [tetrominoX] ; Piece X
-			mov ax, [tetrominoY]
-			inc ax
-			push ax ; Piece Y + 1 (Down)
-			call DoesPieceFit ; ax = DoesPieceFit
-			cmp ax, 1 ; Check if can move
-			je @@ForceDown ; piece cant go down then it reached it's final position
-
-			; Lock piece in place
-			call LockPieceInPlace
-			
-			; Check for lines
-			call CheckLines
-
-			; Pick new piece
-			mov [tetrominoX], 3
-			mov [tetrominoY], -3
-
-			push 7
-			call Random
-			add ax, 1
-
-			mov [tetrominoID], ax
-			mov [tetrominoRotation], 0
-
-			inc [pieceCount]
-			mov ax, [pieceCount]
-			div [pieceToIncreaseDiff]
-			cmp ah, 0 ; If the modulu is 0 then increase difficulty
-			jne @@DontIncreaseDifficulty
-
-			cmp [gameSpeed], 2
-			jbe @@DontIncreaseDifficulty ; Dont make the game impossible
-
-			dec [gameSpeed]; Increase difficulty
-
-			@@DontIncreaseDifficulty:
-
-
-			; If new piece doesn't fit then game over
-			push [tetrominoID] ; Piece ID
-			push [tetrominoRotation] ; Piece rotation
-			push [tetrominoX] ; Piece X
-			mov ax, [tetrominoY]
-			inc ax
-			push ax ; Piece Y + 1 (Down)
-			call DoesPieceFit ; ax = DoesPieceFit
-			cmp ax, 0
-			je @@GameOver
-
-			jmp @@AfterForceDown
-			@@ForceDown:
-				inc [tetrominoY]
-				mov [gameSpeedCount], 0
-			@@AfterForceDown:
-
-		@@Render:
-			; Cursor animation
-			inc [cursorBlinkCount]
-			mov al, [cursorBlinkCount]
-			cmp al, [cursorBlinkSpeed]
-			jne @@DontBlink
-			mov [cursorBlinkCount], 0
-
-			cmp [showCursor], 1
-			jne @@HideCursor
-
-			@@ShowCursor:
-			push offset cursor
-			push 9
-			push 2
-			push 289
-			push 90
-			call Draw
-			mov [showCursor], 0
-			jmp @@DontBlink
-
-			@@HideCursor:
-			push offset cursorOff
-			push 9
-			push 2
-			push 289
-			push 90
-			call Draw
-			mov [showCursor], 1 
-
-			@@DontBlink:
-			; Send game field to render
-			call DrawGameField
-
-			call DrawCurrentPiece
-
-			; Check if there are any lines to remove
-			pusha 
-			mov cx, 4
-			xor bx, bx
-			@@LineRemoveCheckLoop:
-				cmp [linesToRemove + bx], '-'
-				jne @@RemoveLines; There are lines to remove
-				inc bx
-				loop @@LineRemoveCheckLoop
-				jmp @@DontRemoveLines
-
-			@@RemoveLines:
-				; First, render the unstaurated bricks
-				call Render
-
-				; Wait a bit so the player will see the animation
-				xor al, al ; if al won't be 0 then this int will mess with the memory
-				mov ah, 86h
-				mov cx, 0006h
-				mov dx, 1A80h 	; CX:DX microseconds (=1,000,000ths of a second)
-				int 15h			; 00061A80h = 400,000 = 400ms
-
-				; Remove lines
-				mov cx, 4
-				xor bx, bx
-				@@RemoveLinesLoop:
-					cmp [linesToRemove+bx], '-'
-					jne @@RemoveLine
-					jmp @@Next
-
-					@@RemoveLine:
-						xor ax, ax
-						mov al, [linesToRemove+bx]
-						push ax
-						call MoveLinesDown
-						add [score], 100
-						mov [linesToRemove+bx], '-'
-
-					@@Next:
-					inc bx
-					loop @@RemoveLinesLoop
-
-			@@DontRemoveLines:
-			popa
-
-			call Render
-			call PrintScore
-		jmp @@GameLoop
-
-	@@GameOver:	
-
-	mov ah, 1
-	int 21h
 exit:
 	mov ax, 4c00h
 	int 21h
